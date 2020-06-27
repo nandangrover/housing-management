@@ -29,10 +29,10 @@ const Sidebar: any = ({
 
   const listItems: any = [
     { text: 'Home', icon: 'home', link: '/home' },
-    { text: 'Notices', icon: 'call_to_action', link: '/events' },
+    { text: 'Notices', icon: 'call_to_action', link: '/notices' },
     { text: 'Billing', icon: 'monetization_on', link: '/billing' },
     <Divider light style={{ margin: '5px 0 5px 45px' }} />,
-    { text: 'Profile', icon: 'perm_identity', link: '/profile' },
+    { text: 'Update', icon: 'perm_identity', link: '/profile' },
     { text: 'Logout', icon: 'power_settings_new', link: '/logout' },
   ];
 

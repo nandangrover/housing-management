@@ -78,7 +78,7 @@ const UserMutation = {
           },
           config.jwtSecret,
           {
-            expiresIn: '1h'
+            expiresIn: '1d'
           }
         );
         return {
@@ -112,7 +112,7 @@ const UserMutation = {
         },
         config.jwtSecret,
         {
-          expiresIn: '1h'
+          expiresIn: '1d'
         }
       );
       return {

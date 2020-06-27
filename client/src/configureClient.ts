@@ -27,9 +27,10 @@ const httpLink = new HttpLink({
 });
 
 const authMiddleware = new ApolloLink((operation, forward) => {
+  const authToken = Cookies.get('token');
   operation.setContext({
     headers: {
-      authorization: authToken || null,
+      authorization: Cookies.get('token') || null,
     },
   });
   // Add onto payload for WebSocket authentication
@@ -51,6 +52,7 @@ const webSocketLink: WebSocketLink = new WebSocketLink({
  */
 export const setToken = async (token: string | undefined) => {
   try {
+    if (Cookies.get('token')) return;
     authToken = token ? `Bearer ${token}` : '';
     Cookies.set('token', authToken, { expires: 7 });
   } catch (error) {
@@ -76,12 +78,37 @@ export const getToken = (): any => {
         window.location.href = './';
       }
     }
-    authToken = decoded ? decoded : '';
+    authToken = token ?? '';
     return authToken;
   } catch (error) {
     console.log(error);
   }
 };
+
+/**
+ * Get Decoded User
+ */
+export const getUser = (): any => {
+  try {
+    const token = Cookies.get('token');
+    let decoded: any = '';
+    if (token) {
+      decoded = jwt_decode(token);
+
+      const currentTime = Date.now() / 1000; // to get in milliseconds
+      if (decoded.exp < currentTime) {
+        // Logout user
+        destroyToken();
+        // Redirect to login
+        window.location.href = './';
+      }
+    }
+    return decoded ?? '';
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
 /**
  * Destroy Token

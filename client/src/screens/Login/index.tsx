@@ -2,11 +2,10 @@
  * SignUp Page
  */
 
-import React, { useState, FormEvent, ChangeEvent, useContext } from 'react';
+import React, { useState, useEffect, FormEvent, ChangeEvent, useContext } from 'react';
 import { toast } from 'react-toastify';
-import Cookies from 'js-cookie';
 import LOGIN_USER from '../../graphql/mutation/login';
-import { setToken, getToken } from '../../configureClient';
+import { setToken, getUser } from '../../configureClient';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import { useMutation } from '@apollo/react-hooks';
 import {
@@ -60,6 +59,11 @@ const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
     password: '',
   });
 
+  useEffect(() => {
+    const user = getUser();
+    if (user) props.history.replace('/home');
+  });
+
   const [login, { error: mutationError }] = useMutation(LOGIN_USER);
 
   // Context provides info regarding existance of user
@@ -101,12 +105,10 @@ const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
         },
       });
 
-      const { token, userId } = data?.login;
+      const { token } = data?.login;
       setToken(token);
-      Cookies.set('userId', userId, { expires: 7 });
-
       // Set the new user for all the components to know
-      setUser(getToken());
+      setUser(getUser());
       props.history.replace('/home');
     } catch (error) {
       toast.error(mutationError?.message ?? 'Unknown error', {

@@ -2,11 +2,10 @@
  * SignUp Page
  */
 
-import React, { useState, FormEvent, ChangeEvent } from 'react';
+import React, { useState, useContext, useEffect, FormEvent, ChangeEvent } from 'react';
 import { toast } from 'react-toastify';
-import Cookies from 'js-cookie';
 import CREATE_USER from '../../graphql/mutation/createUser';
-import { setToken } from '../../configureClient';
+import { setToken, getUser } from '../../configureClient';
 import { validateEmail, validatePassword, validateFlat } from '../../utils/validation';
 import { useMutation } from '@apollo/react-hooks';
 import {
@@ -27,6 +26,7 @@ import Footer from '../../components/Footer';
 import { RouteComponentProps } from 'react-router-dom';
 import './styles.scss';
 import { ExecutionResult } from 'react-apollo';
+import { UserContext } from '../../App';
 
 interface SignUpState {
   [key: string]: any;
@@ -65,7 +65,15 @@ const SignUp: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
     password: '',
   });
 
+  useEffect(() => {
+    const user = getUser();
+    if (user) props.history.replace('/home');
+  });
+
   const [createUser, { error: mutationError }] = useMutation(CREATE_USER);
+
+  // Context provides info regarding existance of user
+  const { setUser } = useContext(UserContext);
 
   const classes = useStyles();
 
@@ -106,9 +114,11 @@ const SignUp: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
           userInput: { ...values },
         },
       });
-      const { token, userId } = data?.createUser;
+      const { token } = data?.createUser;
       setToken(token);
-      Cookies.set('userId', userId, { expires: 7 });
+
+      setUser(getUser());
+      // Redirect to home
       props.history.replace('/home');
     } catch (error) {
       toast.error(mutationError?.message ?? 'Unknown error', { autoClose: 6000 });

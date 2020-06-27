@@ -7,13 +7,14 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ApolloProvider } from '@apollo/react-hooks';
-import apolloClient, { getToken } from './configureClient';
+import apolloClient, { getUser } from './configureClient';
 import PrivateRoute from './utils/auth';
 import Login from './screens/Login';
 import Logout from './components/Logout';
 import SignUp from './screens/SignUp';
 import Home from './screens/Home';
-import Users from './screens/Users';
+import Billing from './screens/Billing';
+import Notices from './screens/Notices';
 import Update from './screens/Update';
 import NoMatch from './screens/NoMatch';
 import Subscription from './screens/Subscription';
@@ -48,7 +49,7 @@ export const UserContext = React.createContext<UserInfo>({
 });
 
 const App: React.FC = () => {
- const [userInfo, setUser] = useState<any>(getToken());
+ const [userInfo, setUser] = useState<any>(getUser());
  
   return (
     <UserContext.Provider value={{
@@ -61,10 +62,11 @@ const App: React.FC = () => {
             <Switch>
               <Route exact path="/" component={Login} />
               <Route path="/signup" component={SignUp} />
-              <PrivateRoute path="/home" component={Home} />
               <Route path="/login" component={Login} />
               <Route path="/logout" component={Logout} />
-              <PrivateRoute path="/users" component={Users} />
+              <PrivateRoute path="/home" component={Home} />
+              <PrivateRoute path="/billing" component={Billing} />
+              <PrivateRoute path="/notices" component={Notices} />
               <PrivateRoute path="/update" component={Update} />
               <PrivateRoute path="/subscription" component={Subscription} />
               <Route path="*" component={NoMatch} />

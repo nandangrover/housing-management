@@ -1,0 +1,16 @@
+.sec-1 {
+    display: inline-grid;
+}
+
+.sec-2 {
+    display: inline-grid;
+    float: right;
+    padding: 20px 0px 8px;
+}
+
+@media screen and (max-width: 500px) {
+    .sec-2 {
+        display: inline-grid;
+        float: inherit;
+    }
+  }
