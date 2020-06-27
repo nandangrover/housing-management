@@ -19,7 +19,9 @@ const USER_ADDED = 'USER_ADDED';
  */
 const UserQueries = {
   users: async (parent, args, context) => {
-    if (!context.isAuth) { throw new Error('Not Authenticated'); }
+    if (!context.isAuth) {
+      throw new Error('Not Authenticated');
+    }
     try {
       const users = await User.find();
       return users.map((user) => {
@@ -30,7 +32,9 @@ const UserQueries = {
     }
   },
   user: async (parent, { userId }, context) => {
-    if (!context.isAuth) { throw new Error('Not Authenticated'); }
+    if (!context.isAuth) {
+      throw new Error('Not Authenticated');
+    }
     try {
       const user = await User.findById(userId);
       return transformUser(user);
@@ -38,31 +42,6 @@ const UserQueries = {
       throw err;
     }
   },
-  login: async (parent, { email, password }) => {
-    try {
-      const user: any = await User.findOne({ email });
-      if (!user) {
-        throw new Error('User does not Exists');
-      }
-
-      const valid: boolean = await bcrypt.compare(password, user.password);
-
-      if (!valid) {
-        throw new Error('Incorrect password');
-      }
-
-      const token = jwt.sign({ userId: user.id, name: user.firstName, permissions: user.permissions }, config.jwtSecret, {
-        expiresIn: '1h'
-      });
-      return {
-        userId: user.id,
-        token,
-        tokenExpiration: 1
-      };
-    } catch (err) {
-      throw err;
-    }
-  }
 };
 
 /**
@@ -91,9 +70,17 @@ const UserMutation = {
         pubsub.publish(USER_ADDED, {
           userAdded: transformUser(savedUser)
         });
-        const token = jwt.sign({ userId: savedUser.id, name: savedUser.get('firstName'), permissions: savedUser.get('permissions') }, config.jwtSecret, {
-          expiresIn: '1h'
-        });
+        const token = jwt.sign(
+          {
+            userId: savedUser.id,
+            name: savedUser.get('firstName'),
+            permissions: savedUser.get('permissions')
+          },
+          config.jwtSecret,
+          {
+            expiresIn: '1h'
+          }
+        );
         return {
           userId: savedUser.id,
           token,
@@ -102,6 +89,39 @@ const UserMutation = {
       }
     } catch (error) {
       throw error;
+    }
+  },
+  login: async (parent, { email, password }) => {
+    try {
+      const user: any = await User.findOne({ email });
+      if (!user) {
+        throw new Error('User does not Exists');
+      }
+
+      const valid: boolean = await bcrypt.compare(password, user.password);
+
+      if (!valid) {
+        throw new Error('Incorrect password');
+      }
+
+      const token = jwt.sign(
+        {
+          userId: user.id,
+          name: user.firstName,
+          permissions: user.permissions
+        },
+        config.jwtSecret,
+        {
+          expiresIn: '1h'
+        }
+      );
+      return {
+        userId: user.id,
+        token,
+        tokenExpiration: 1
+      };
+    } catch (err) {
+      throw err;
     }
   },
   updateUser: async (parent, { userId, updateUser }, context) => {

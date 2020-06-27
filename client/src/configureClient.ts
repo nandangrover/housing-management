@@ -61,7 +61,7 @@ export const setToken = async (token: string | undefined) => {
 /**
  * Get Token & Set Token In Request
  */
-export const getToken = () => {
+export const getToken = (): any => {
   try {
     const token = Cookies.get('token');
     let decoded: any = '';

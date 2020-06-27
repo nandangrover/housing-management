@@ -10,12 +10,12 @@ const typeDefs = gql`
   type Query {
     users: [User!]!
     user(userId: ID!): User!
-    login(email: String!, password: String!): AuthData!
     notices: [Notice!]!
     notice(noticeId: ID!): Notice!
   }
   type Mutation {
     createUser(userInput: UserInput): AuthData!
+    login(email: String!, password: String!): AuthData!
     updateUser(userId: ID!, updateUser: UpdateUser): User!
 
     addNotice(noticeInput: NoticeInput): Notice!

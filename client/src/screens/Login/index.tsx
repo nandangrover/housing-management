@@ -2,16 +2,13 @@
  * SignUp Page
  */
 
-import React, { useState, FormEvent, ChangeEvent } from 'react';
+import React, { useState, FormEvent, ChangeEvent, useContext } from 'react';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
-import LOGIN_USER from '../../graphql/query/login';
-import { setToken } from '../../configureClient';
-import {
-  validateEmail,
-  validatePassword,
-} from '../../utils/validation';
-import { useQuery } from '@apollo/react-hooks';
+import LOGIN_USER from '../../graphql/mutation/login';
+import { setToken, getToken } from '../../configureClient';
+import { validateEmail, validatePassword } from '../../utils/validation';
+import { useMutation } from '@apollo/react-hooks';
 import {
   Avatar,
   Button,
@@ -22,8 +19,6 @@ import {
   Box,
   Typography,
   makeStyles,
-  FormControlLabel,
-  Checkbox,
 } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Container from '@material-ui/core/Container';
@@ -32,6 +27,7 @@ import Footer from '../../components/Footer';
 import { RouteComponentProps } from 'react-router-dom';
 import './styles.scss';
 import { ExecutionResult } from 'react-apollo';
+import { UserContext } from '../../App';
 
 interface SignUpState {
   email: string;
@@ -64,15 +60,12 @@ const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
     password: '',
   });
 
+  const [login, { error: mutationError }] = useMutation(LOGIN_USER);
+
+  // Context provides info regarding existance of user
+  const { setUser } = useContext(UserContext);
+
   const classes = useStyles();
-
-  // const { loading, error, data: userData } = useQuery(LOGIN_USER, {variables : {
-  //   email: values.email,
-  //   passsword: values.password,
-  // }});
-
-  // if (loading) return <p>Loading ...</p>;
-  // if (error) return <p>`Error! ${error.message}`</p>;
 
   /**
    * Handle Input field change
@@ -102,13 +95,21 @@ const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
         return;
       }
 
-      // console.log(userData)
-      // const { token, userId } = userData?.createUser;
-      // setToken(token);
-      // Cookies.set('userId', userId, { expires: 7 });
+      const { data }: ExecutionResult = await login({
+        variables: {
+          ...values,
+        },
+      });
+
+      const { token, userId } = data?.login;
+      setToken(token);
+      Cookies.set('userId', userId, { expires: 7 });
+
+      // Set the new user for all the components to know
+      setUser(getToken());
       props.history.replace('/home');
     } catch (error) {
-      toast.error(error?.message ?? 'Unknown error', {
+      toast.error(mutationError?.message ?? 'Unknown error', {
         autoClose: 6000,
       });
     }
@@ -116,7 +117,7 @@ const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
 
   return (
     <React.Fragment>
-      <Header />
+      <Header {...props} />
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
@@ -153,10 +154,6 @@ const Login: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
                   autoComplete="current-password"
                 />
               </Grid>
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
             </Grid>
             <Button
               type="submit"

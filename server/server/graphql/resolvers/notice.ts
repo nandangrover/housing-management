@@ -16,7 +16,9 @@ const NOTICE_ADDED = 'NOTICE_ADDED';
  */
 const NoticeQueries = {
   notices: async (parent, args, context) => {
-    if (!context.isAuth) { throw new Error('Not Authenticated'); }
+    if (!context.isAuth) {
+      throw new Error('Not Authenticated');
+    }
     try {
       const notices = await Notice.find();
       return notices.map((notice) => {
@@ -27,7 +29,9 @@ const NoticeQueries = {
     }
   },
   notice: async (parent, { noticeId }, context) => {
-    if (!context.isAuth) { throw new Error('Not Authenticated'); }
+    if (!context.isAuth) {
+      throw new Error('Not Authenticated');
+    }
     try {
       const notice = await Notice.findById(noticeId);
       return transformNotice(notice);
@@ -42,7 +46,9 @@ const NoticeQueries = {
  */
 const NoticeMutation = {
   addNotice: async (parent: any, { noticeInput }: any, context: any) => {
-    if (!context.isAuth) { throw new Error('Not Authenticated'); }
+    if (!context.isAuth) {
+      throw new Error('Not Authenticated');
+    }
     try {
       const newNotice = new Notice({
         _id: new mongoose.Types.ObjectId(),
@@ -68,9 +74,9 @@ const NoticeMutation = {
  * Notice Subscriptions
  */
 const NoticeSubscription = {
-    noticeAdded: {
-      subscribe: () => pubsub.asyncIterator([NOTICE_ADDED])
-    }
+  noticeAdded: {
+    subscribe: () => pubsub.asyncIterator([NOTICE_ADDED])
+  }
 };
 
 export { NoticeMutation, NoticeQueries, NoticeSubscription };

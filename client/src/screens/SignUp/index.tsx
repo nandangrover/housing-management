@@ -117,7 +117,7 @@ const SignUp: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
 
   return (
     <React.Fragment>
-      <Header />
+      <Header {...props}/>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>

@@ -2,7 +2,7 @@
  * App Component
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,6 +10,7 @@ import { ApolloProvider } from '@apollo/react-hooks';
 import apolloClient, { getToken } from './configureClient';
 import PrivateRoute from './utils/auth';
 import Login from './screens/Login';
+import Logout from './components/Logout';
 import SignUp from './screens/SignUp';
 import Home from './screens/Home';
 import Users from './screens/Users';
@@ -18,6 +19,11 @@ import NoMatch from './screens/NoMatch';
 import Subscription from './screens/Subscription';
 import { ThemeProvider } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
+
+interface UserInfo {
+  user: any;
+  setUser: any;
+}
 
 const theme = createMuiTheme({
   palette: {
@@ -36,11 +42,19 @@ const theme = createMuiTheme({
 /**
  * Logged in User info
  */
-export const UserContext = React.createContext(getToken());
+export const UserContext = React.createContext<UserInfo>({
+  user: undefined,
+  setUser: ()  => {},
+});
 
-const App = () => {
+const App: React.FC = () => {
+ const [userInfo, setUser] = useState<any>(getToken());
+ 
   return (
-    <UserContext.Provider value={getToken()}>
+    <UserContext.Provider value={{
+      user: userInfo,
+      setUser,
+    }}>
       <ThemeProvider theme={theme}>
         <ApolloProvider client={apolloClient}>
           <Router>
@@ -48,6 +62,8 @@ const App = () => {
               <Route exact path="/" component={Login} />
               <Route path="/signup" component={SignUp} />
               <PrivateRoute path="/home" component={Home} />
+              <Route path="/login" component={Login} />
+              <Route path="/logout" component={Logout} />
               <PrivateRoute path="/users" component={Users} />
               <PrivateRoute path="/update" component={Update} />
               <PrivateRoute path="/subscription" component={Subscription} />

@@ -1,16 +1,18 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import MenuIcon from '@material-ui/icons/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import { UserContext } from '../../App';
-import { destroyToken } from '../../configureClient';
+import Sidebar from '../Sidebar';
+import { RouteComponentProps } from 'react-router-dom';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
   },
@@ -22,16 +24,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Header: React.FC = () => {
-  const user = useContext(UserContext);
-  const classes = useStyles();
-  const [auth, setAuth] = React.useState<boolean>(false);
-  const [anchorEl, setAnchorEl] = React.useState<HTMLAnchorElement | null>(null);
-  const open = Boolean(anchorEl);
+const Header: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
+  // Context provides info regarding existance of user
+  const { user } = useContext(UserContext);
 
-  // const handleChange = (event: any):void  => {
-  //   setAuth(event.target.checked);
-  // };
+  const [isOpened, setSideBarOpen] = useState(false);
+
+  const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState<HTMLAnchorElement | null>(
+    null
+  );
+  const open = Boolean(anchorEl);
 
   const handleMenu = (event: any): void => {
     setAnchorEl(event.currentTarget);
@@ -42,15 +45,30 @@ const Header: React.FC = () => {
   };
 
   const handleLogout = (): void => {
-    destroyToken();
+    props.history.replace('/logout');
+  };
+
+  const openSideBar = (): any => {
+    setSideBarOpen(true);
   };
 
   return (
     <div className={classes.root}>
+      {user && <Sidebar isOpened={isOpened} onClose={setSideBarOpen} />}
       <AppBar position="static">
         <Toolbar>
+          {user && (
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="menu"
+              onClick={openSideBar}>
+              <MenuIcon />
+            </IconButton>
+          )}
           <Typography variant="h6" className={classes.title}>
-            Lodha Society
+            Tesla Society
           </Typography>
           {user && (
             <div>
@@ -59,10 +77,16 @@ const Header: React.FC = () => {
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
                 onClick={handleMenu}
-                color="inherit"
-              >
+                color="inherit">
                 <AccountCircle />
               </IconButton>
+              <Typography
+                align="center"
+                variant="body2"
+                className={classes.title}
+                display="inline">
+                Logged in as {user?.name ?? ''}
+              </Typography>
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorEl}
@@ -76,8 +100,7 @@ const Header: React.FC = () => {
                   horizontal: 'right',
                 }}
                 open={open}
-                onClose={handleClose}
-              >
+                onClose={handleClose}>
                 <MenuItem onClick={handleClose}>My Notices</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
@@ -87,6 +110,6 @@ const Header: React.FC = () => {
       </AppBar>
     </div>
   );
-}
+};
 
 export default Header;
