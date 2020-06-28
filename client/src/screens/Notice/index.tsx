@@ -71,7 +71,7 @@ const Notice: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
             color="textPrimary"
             style={{ margin: '20px 0px 8px' }}
             className="title">
-            Society Members
+            Notice
           </Typography>
           <Typography
             align="left"

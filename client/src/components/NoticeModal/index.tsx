@@ -58,7 +58,7 @@ const NoticeModal: React.FC<any> = ({state = false, setModalState}: any) => {
     <div>
       <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={state}>
         <DialogTitle id="customized-dialog-title" onClose={handleClose}>
-          Modal title
+          Add a new notice
         </DialogTitle>
         <DialogContent dividers>
           <Typography gutterBottom>
