@@ -15,6 +15,7 @@ import SignUp from './screens/SignUp';
 import Home from './screens/Home';
 import Billing from './screens/Billing';
 import Notices from './screens/Notices';
+import Notice from './screens/Notice';
 import Update from './screens/Update';
 import NoMatch from './screens/NoMatch';
 import Subscription from './screens/Subscription';
@@ -67,6 +68,7 @@ const App: React.FC = () => {
               <PrivateRoute path="/home" component={Home} />
               <PrivateRoute path="/billing" component={Billing} />
               <PrivateRoute path="/notices" component={Notices} />
+              <PrivateRoute path="/notice" component={Notice} />
               <PrivateRoute path="/update" component={Update} />
               <PrivateRoute path="/subscription" component={Subscription} />
               <Route path="*" component={NoMatch} />
