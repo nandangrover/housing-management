@@ -2,15 +2,15 @@
  * File containing all user queries, mutations and subscriptions
  */
 
-import { PubSub } from "apollo-server";
-import uploadFile from "../../helpers/fileUploader";
-import mongoose from "mongoose";
-import Notice from "../../models/notice";
-import { transformNotice } from "./merge";
+import { PubSub } from 'apollo-server';
+import mongoose from 'mongoose';
+import uploadFile from '../../helpers/fileUploader';
+import Notice from '../../models/notice';
+import { transformNotice } from './merge';
 
 const pubsub = new PubSub();
 
-const NOTICE_ADDED = "NOTICE_ADDED";
+const NOTICE_ADDED = 'NOTICE_ADDED';
 
 /**
  * Notice Queries
@@ -18,7 +18,7 @@ const NOTICE_ADDED = "NOTICE_ADDED";
 const NoticeQueries = {
   notices: async (parent, args, context) => {
     if (!context.isAuth) {
-      throw new Error("Not Authenticated");
+      throw new Error('Not Authenticated');
     }
     try {
       const notices = await Notice.find().sort({ createdAt: -1 });
@@ -31,7 +31,7 @@ const NoticeQueries = {
   },
   notice: async (parent, { noticeId }, context) => {
     if (!context.isAuth) {
-      throw new Error("Not Authenticated");
+      throw new Error('Not Authenticated');
     }
     try {
       const notice = await Notice.findById(noticeId);
@@ -39,7 +39,7 @@ const NoticeQueries = {
     } catch (err) {
       throw err;
     }
-  },
+  }
 };
 
 /**
@@ -48,7 +48,7 @@ const NoticeQueries = {
 const NoticeMutation = {
   addNotice: async (parent: any, { noticeInput }: any, context: any) => {
     if (!context.isAuth) {
-      throw new Error("Not Authenticated");
+      throw new Error('Not Authenticated');
     }
 
     try {
@@ -60,13 +60,13 @@ const NoticeMutation = {
         description: noticeInput.description,
         status: noticeInput.status,
         file: data.Location,
-        mimetype: noticeInput.fileName,
+        mimetype: noticeInput.fileName
       });
       const savedNotice = await newNotice.save();
 
       const transformed = await transformNotice(savedNotice);
       pubsub.publish(NOTICE_ADDED, {
-        noticeAdded: transformed,
+        noticeAdded: transformed
       });
       return transformed;
     } catch (error) {
@@ -77,21 +77,21 @@ const NoticeMutation = {
   updateNotice: async (parent, { userId, noticeId, updateNotice }, context) => {
     // If not authenticated throw error
     if (!context.isAuth) {
-      throw new Error("Not Authenticated");
+      throw new Error('Not Authenticated');
     }
 
     if (context.userId !== userId) {
-      throw new Error("Not Authenticated");
+      throw new Error('Not Authenticated');
     }
     try {
       const notice = await Notice.findByIdAndUpdate(noticeId, updateNotice, {
-        new: true,
+        new: true
       });
       return transformNotice(notice);
     } catch (error) {
       throw error;
     }
-  },
+  }
 };
 
 /**
@@ -99,8 +99,8 @@ const NoticeMutation = {
  */
 const NoticeSubscription = {
   noticeAdded: {
-    subscribe: () => pubsub.asyncIterator([NOTICE_ADDED]),
-  },
+    subscribe: () => pubsub.asyncIterator([NOTICE_ADDED])
+  }
 };
 
 export { NoticeMutation, NoticeQueries, NoticeSubscription };

@@ -48,7 +48,6 @@
     "@types/lodash": "^4.14.149",
     "@types/mongoose": "^5.5.41",
     "@types/node": "^13.1.7",
-    "husky": "^4.2.0",
     "nodemon": "^1.19.2",
     "tslint": "^5.20.1",
     "typescript": "^3.7.5"

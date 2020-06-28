@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NoticeSubscription = exports.NoticeQueries = exports.NoticeMutation = void 0;
 const tslib_1 = require("tslib");
 const apollo_server_1 = require("apollo-server");
-const fileUploader_1 = tslib_1.__importDefault(require("../../helpers/fileUploader"));
 const mongoose_1 = tslib_1.__importDefault(require("mongoose"));
+const fileUploader_1 = tslib_1.__importDefault(require("../../helpers/fileUploader"));
 const notice_1 = tslib_1.__importDefault(require("../../models/notice"));
 const merge_1 = require("./merge");
 const pubsub = new apollo_server_1.PubSub();
@@ -60,7 +60,7 @@ const NoticeMutation = {
                 description: noticeInput.description,
                 status: noticeInput.status,
                 file: data.Location,
-                mimetype: noticeInput.fileName,
+                mimetype: noticeInput.fileName
             });
             const savedNotice = yield newNotice.save();
             const transformed = yield merge_1.transformNotice(savedNotice);

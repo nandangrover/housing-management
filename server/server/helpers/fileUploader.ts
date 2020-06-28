@@ -1,8 +1,8 @@
-import AWS from "aws-sdk";
+import AWS from 'aws-sdk';
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 });
 
 /**
@@ -16,7 +16,7 @@ const uploadFile = async (fileName, fileContent): Promise<any> => {
   const params = {
     Bucket: process.env.BUCKET_NAME,
     Key: `assets/${fileName}`, // File name you want to save as in S3
-    Body: fileContent,
+    Body: fileContent
   };
 
   // Uploading files to the bucket
