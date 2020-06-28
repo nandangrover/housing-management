@@ -56,7 +56,7 @@ class Express {
 
     // Serve static assets if in production
     if (process.env.NODE_ENV === 'production') {
-      this.express.use(express.static('client/build'));
+      this.express.use(express.static(path.join(__dirname, 'client', 'build')));
 
       this.express.get('*', (req, res) => {
         res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));

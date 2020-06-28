@@ -52,7 +52,11 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
       const actionData = [{
         icon: 'link',
         tooltip: 'Link to notice',
-        onClick: (event: any, rowData: any) => alert("You saved " + rowData.id)
+        onClick: (event: any, rowData: any) => props.history.push({
+          pathname: '/notice',
+          search: `?u=${rowData.id}`,
+          // state: { detail: response.data }
+        }),
       }];
       setData({ data: mutatedData, actions: actionData });
     }
