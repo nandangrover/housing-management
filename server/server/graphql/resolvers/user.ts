@@ -41,7 +41,7 @@ const UserQueries = {
     } catch (err) {
       throw err;
     }
-  },
+  }
 };
 
 /**

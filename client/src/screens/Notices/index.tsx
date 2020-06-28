@@ -7,67 +7,56 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { RouteComponentProps } from 'react-router-dom';
 import MaterialTable from 'material-table';
-import { Container, Typography, Button } from '@material-ui/core';
+import { Container, Typography, Button, Icon } from '@material-ui/core';
 import { useQuery } from '@apollo/react-hooks';
-import GET_USERS from '../../graphql/query/user';
+import GET_NOTICES from '../../graphql/query/notices';
 import NoticeModal from '../../components/NoticeModal';
 import AddIcon from '@material-ui/icons/Add';
+import moment from 'moment';
 import './styles.scss';
 
 const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const { loading, error, data } = useQuery(GET_USERS);
-
-  let message = 'Users';
-  if (loading) message = 'Loading...';
-  if (error) message = `Error! ${error}`;
-  if (data && data.users.length <= 0) message = 'No Users';
+  const { loading, data } = useQuery(GET_NOTICES);
 
   const columns: any = [
-    { title: 'Name', field: 'name' },
-    { title: 'Surname', field: 'surname' },
-    { title: 'Email', field: 'email' },
-    { title: 'Flat', field: 'flat' },
+    { title: 'Created By', field: 'name' },
+    { title: 'Member Email', field: 'email' },
+    { title: 'Notice Description', field: 'description' },
+    { title: 'Notice Created At', field: 'created' },
     {
-      title: 'Notices Posted',
-      field: 'noticeCount',
-      type: 'numeric',
-    },
-    {
-      title: 'Unresolved Notices',
-      field: 'unresolved',
-      type: 'numeric',
+      title: 'Resolved Status',
+      field: 'status',
+      render: (rowData: any) => <Icon style={{ color: '#90caf9' }}>{rowData.status}</Icon> 
     },
   ];
 
   const [tableData, setData] = useState<any>({
     data: [],
+    actions: [],
   });
 
   const [modalState, setModalState] = useState<boolean>(false);
   useEffect(() => {
     if (!loading) {
-      const mutatedData = data.users.map(
-        ({ email, firstName, flat, lastName, notices }: any) => ({
-          name: firstName,
+      const mutatedData = data?.notices.map(
+        ({ _id, description, createdAt, status, user: { firstName, lastName, email} }: any) => ({
+          name: `${firstName} ${lastName}`,
+          id: _id,
           email: email,
-          flat: flat,
-          surname: lastName,
-          noticeCount: notices.length,
-          unresolved: countUnresolved(notices),
+          description: description,
+          created: moment(createdAt).format('MMMM Do YYYY, h:mm:ss a'),
+          status: status ? 'checkcircle' : 'info',
         })
-      );
-      setData({ data: mutatedData });
-    }
-  }, [loading]);
+      ) ?? [];
 
-  const countUnresolved = (notices: any): number => {
-    return notices.reduce((acc: number, curr: any) => {
-      if (!curr.status) {
-        acc += 1;
-      }
-      return acc;
-    }, 0);
-  };
+      const actionData = [{
+        icon: 'link',
+        tooltip: 'Link to notice',
+        onClick: (event: any, rowData: any) => alert("You saved " + rowData.id)
+      }];
+      setData({ data: mutatedData, actions: actionData });
+    }
+  }, [loading, data]);
 
   const showModal = () => {
     setModalState(true);
@@ -105,7 +94,7 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
             startIcon={<AddIcon />}>
             Add Notice
           </Button>
-          <NoticeModal state={modalState} onClose={setModalState} />
+          <NoticeModal state={modalState} setModalState={setModalState} />
           </div>
           <hr />
         </div>
@@ -115,6 +104,7 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
           <MaterialTable
             columns={columns}
             data={tableData.data}
+            actions={tableData.actions}
             title="Member List"
           />
         </div>

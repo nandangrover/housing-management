@@ -21,7 +21,7 @@ const Billing: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
             color="textPrimary"
             style={{ margin: '20px 0px 8px' }}
             className="title">
-            Members: Billing
+            Billing
           </Typography>
           <Typography
             align="left"
@@ -29,7 +29,7 @@ const Billing: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
             color="textPrimary"
             style={{ margin: '0px 0px 23px' }}
             className="description">
-            Check your dues!
+            Check for latest bills which you are due to pay!
           </Typography>
         </div>
       </Container>

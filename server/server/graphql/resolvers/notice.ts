@@ -20,7 +20,7 @@ const NoticeQueries = {
       throw new Error('Not Authenticated');
     }
     try {
-      const notices = await Notice.find();
+      const notices = await Notice.find().sort({createdAt: -1});
       return notices.map((notice) => {
         return transformNotice(notice);
       });

@@ -70,8 +70,10 @@ const typeDefs = gql`
     userId: ID!
     description: String!
     status: Boolean!
-    file: Upload!
+    file: String
     user: User!
+    createdAt: String!
+    updatedAt: String!
   }
 
   type File {
@@ -85,7 +87,7 @@ const typeDefs = gql`
     userId: ID!
     description: String!
     status: Boolean!
-    file: String!
+    file: Upload!
   }
 `;
 

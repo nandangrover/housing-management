@@ -13,12 +13,7 @@ import GET_USERS from '../../graphql/query/user';
 import './styles.scss';
 
 const Home: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const { loading, error, data } = useQuery(GET_USERS);
-
-  let message = 'Users';
-  if (loading) message = 'Loading...';
-  if (error) message = `Error! ${error}`;
-  if (data && data.users.length <= 0) message = 'No Users';
+  const { loading, data } = useQuery(GET_USERS);
 
   const columns: any = [
     { title: 'Name', field: 'name' },
@@ -42,7 +37,7 @@ const Home: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   });
   useEffect(() => {
     if (!loading) {
-      const mutatedData = data.users.map(
+      const mutatedData = data?.users.map(
         ({ email, firstName, flat, lastName, notices }: any) => ({
           name: firstName,
           email: email,
@@ -51,10 +46,10 @@ const Home: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
           noticeCount: notices.length,
           unresolved: countUnresolved(notices),
         })
-      );
+      ) ?? [];
       setData({ data: mutatedData });
     }
-  }, [loading]);
+  }, [loading, data]);
 
   const countUnresolved = (notices: any): number => {
     return notices.reduce((acc: number, curr: any) => {
