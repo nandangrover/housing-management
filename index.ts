@@ -4,8 +4,8 @@
 
 import Promise from 'bluebird';
 import mongoose from 'mongoose';
-import config from './config';
-import Express from './config/express';
+import config from './server/config';
+import Express from './server/config/express';
 
 /**
  * Promisify All The Mongoose

@@ -1,0 +1,52 @@
+{
+  "name": "housing-management",
+  "version": "1.0.0",
+  "description": "Housing Management",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
+    "build": "yarn clean && tsc",
+    "prestart": "yarn build",
+    "start": "tsc --watch & nodemon dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pre-commit": "yarn tslint && yarn build",
+    "tslint": "tslint --project tsconfig.json",
+    "tslint:fix": "tslint --project tsconfig.json --fix",
+    "heroku-postbuild": "YARN_PRODUCTION=false cd ./client yarn && yarn build"
+  },
+  "keywords": [],
+  "author": "Nandan Grover",
+  "license": "MIT",
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn pre-commit"
+    }
+  },
+  "dependencies": {
+    "apollo-server": "^2.9.6",
+    "apollo-server-express": "^2.9.6",
+    "bcrypt": "^5.0.0",
+    "bluebird": "^3.5.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "graphql-voyager": "^1.0.0-rc.31",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
+    "mongoose": "^5.6.13"
+  },
+  "devDependencies": {
+    "@types/bluebird": "^3.5.29",
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.2",
+    "@types/jsonwebtoken": "^8.3.6",
+    "@types/lodash": "^4.14.149",
+    "@types/mongoose": "^5.5.41",
+    "@types/node": "^13.1.7",
+    "husky": "^4.2.0",
+    "nodemon": "^1.19.2",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.5"
+  }
+}
