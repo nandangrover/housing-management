@@ -59,7 +59,7 @@ class Express {
       this.express.use(express.static(path.join(__dirname, '../../../', 'client', 'build')));
 
       this.express.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../../../', 'client', 'build'));
+        res.sendFile(path.join(__dirname, '../../../', 'client', 'build', 'index.html'));
       });
     }
 
