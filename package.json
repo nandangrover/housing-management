@@ -1,6 +1,9 @@
 {
   "name": "housing-management",
   "version": "1.0.0",
+  "engines": {
+    "yarn": "1.x"
+  },
   "description": "Housing Management",
   "private": true,
   "main": "dist/index.js",
