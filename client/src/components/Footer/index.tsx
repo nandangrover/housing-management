@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
   return (
     <Typography style={{padding: '20px'}} variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <a target="_blank" color="inherit" href="https://www.nandangrover.com/">
+      <a target="_blank" rel="noopener noreferrer" color="inherit" href="https://www.nandangrover.com/">
         Nandan Grover
       </a>{' '}
       {new Date().getFullYear()}

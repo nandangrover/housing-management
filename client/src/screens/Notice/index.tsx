@@ -6,96 +6,109 @@ import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { RouteComponentProps } from 'react-router-dom';
-import MaterialTable from 'material-table';
-import { Container, Typography } from '@material-ui/core';
+import { Container, Typography, CircularProgress } from '@material-ui/core';
+import Pagination from '@material-ui/lab/Pagination';
 import { useQuery } from '@apollo/react-hooks';
 import GET_NOTICE from '../../graphql/query/notice';
+import { Document, Page } from 'react-pdf/dist/entry.webpack';
 import './styles.scss';
 
 const Notice: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const { loading, data } = useQuery(GET_NOTICE, {
-    variables: { noticeId: props.history.location.search.slice(3) },
-  });
-
-  const columns: any = [
-    { title: 'Name', field: 'name' },
-    { title: 'Surname', field: 'surname' },
-    { title: 'Email', field: 'email' },
-    { title: 'Flat', field: 'flat' },
+  const { loading: noticeLoading, data: noticeData }: any = useQuery(
+    GET_NOTICE,
     {
-      title: 'Notices Posted',
-      field: 'noticeCount',
-      type: 'numeric',
-    },
-    {
-      title: 'Unresolved Notices',
-      field: 'unresolved',
-      type: 'numeric',
-    },
-  ];
-
-  const [tableData, setData] = useState<any>({
-    data: [],
-  });
-  useEffect(() => {
-    if (!loading && data) {
-      console.log(data)
-      // const mutatedData = data?.users.map(
-      //   ({ email, firstName, flat, lastName, notices }: any) => ({
-      //     name: firstName,
-      //     email: email,
-      //     flat: flat,
-      //     surname: lastName,
-      //     noticeCount: notices.length,
-      //     unresolved: countUnresolved(notices),
-      //   })
-      // ) ?? [];
-      // setData({ data: mutatedData });
+      variables: { noticeId: props.history.location.search.slice(3) },
     }
-  }, [loading, data]);
+  );
 
-  const countUnresolved = (notices: any): number => {
-    return notices.reduce((acc: number, curr: any) => {
-      if (!curr.status) {
-        acc += 1;
-      }
-      return acc;
-    }, 0);
+  const [numPages, setNumPages] = useState<any>(1);
+  const [pageNumber, setPageNumber] = useState<any>(1);
+  const [documentLoading, setDocLoading] = useState<any>(true);
+  const [isPdf, setPdf] = useState<any>(false);
+
+  useEffect(() => {
+    if (!noticeLoading && noticeData) {
+      if (noticeData.notice.mimetype === 'pdf') setPdf(true);
+    }
+  }, [noticeLoading, noticeData]);
+
+  const onDocumentLoadSuccess = ({ numPages }: any) => {
+    setNumPages(numPages);
+    setDocLoading(false);
+  };
+
+  const pageChange = (event: any, page: number) => {
+    setPageNumber(page);
   };
 
   return (
     <React.Fragment>
       <Header {...props} />
-      <Container maxWidth="md">
-        <div className="header-wrapper">
-          <Typography
-            align="center"
-            variant="h4"
-            color="textPrimary"
-            style={{ margin: '20px 0px 8px' }}
-            className="title">
-            Notice
-          </Typography>
-          <Typography
-            align="left"
-            variant="body1"
-            color="textPrimary"
-            style={{ margin: '0px 0px 23px' }}
-            className="description">
-            Explore your neighbours!
-          </Typography>
-          <hr />
+      {noticeData?.notice && (
+        <div className="container">
+          <Container maxWidth="md">
+            <div className="header-wrapper">
+              <Typography
+                align="center"
+                variant="h4"
+                color="textPrimary"
+                style={{ margin: '20px 0px 8px' }}
+                className="title">
+                Notice
+              </Typography>
+              <Typography
+                align="center"
+                variant="body1"
+                color="textPrimary"
+                style={{ margin: '0px 0px 23px' }}
+                className="description">
+                {noticeData.notice.description}
+              </Typography>
+              <hr />
+            </div>
+          </Container>
+          <Container maxWidth="md">
+            {!isPdf && (
+              <img
+                className="responsive-image"
+                alt={noticeData.notice.description}
+                src={noticeData.notice.file}></img>
+            )}
+            {isPdf && (
+              <div className="encapsulator">
+                <div className="responsive-items">
+                  {documentLoading && (
+                    <CircularProgress
+                      style={{ margin: 'auto', display: 'block' }}
+                      color="secondary"
+                    />
+                  )}
+                  <Document
+                    loading=""
+                    file={noticeData.notice.file}
+                    onLoadSuccess={onDocumentLoadSuccess}>
+                    <Page pageNumber={pageNumber}></Page>
+                  </Document>
+                </div>
+                <Typography
+                  align="center"
+                  variant="body1"
+                  color="textPrimary"
+                  style={{ margin: '0px 0px 23px' }}
+                  className="description">
+                  Page {pageNumber} of {numPages}
+                </Typography>
+                <Pagination
+                  className="responsive-items"
+                  onChange={pageChange}
+                  count={numPages}
+                  color="secondary"
+                />
+              </div>
+            )}
+          </Container>
         </div>
-      </Container>
-      <Container maxWidth="md">
-        <div style={{ maxWidth: '100%', margin: '30px 0 30px' }}>
-          <MaterialTable
-            columns={columns}
-            data={tableData.data}
-            title="Member List"
-          />
-        </div>
-      </Container>
+      )}
       <Footer />
     </React.Fragment>
   );

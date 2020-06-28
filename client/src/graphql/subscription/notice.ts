@@ -11,6 +11,7 @@ const NOTICE_ADDED = gql`
         description,
         createdAt,
         updatedAt,
+        mimetype,
         status,
         user {
             firstName,

@@ -3,6 +3,7 @@
  */
 
 import { ApolloServer } from 'apollo-server-express';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
@@ -21,6 +22,10 @@ class Express {
      * Creating an express application
      */
     this.express = express();
+    /**
+     * Ability to process huge files
+     */
+    this.express.use(bodyParser.json({limit: '50mb'}));
     /**
      * Middlerware for using CORS
      */

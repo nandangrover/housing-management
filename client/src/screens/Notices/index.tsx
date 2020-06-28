@@ -26,6 +26,7 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
     { title: 'Created By', field: 'name' },
     { title: 'Member Email', field: 'email' },
     { title: 'Notice Description', field: 'description' },
+    { title: 'Notice Filetype', field: 'mimetype' },
     { title: 'Notice Created At', field: 'created' },
     {
       title: 'Resolved Status',
@@ -64,15 +65,16 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
       ];
       setData({ data: mutatedData, actions: actionData });
     }
-  }, [loading, data]);
+  }, [loading, data, props.history]);
 
+  // Update data for subscription
   useEffect(() => {
-    if (!loading && noticeAdded) {
+    if (!subLoading && noticeAdded) {
       const { noticeAdded: notice } = noticeAdded;
 
       const hydratedData = hydrateNoticeData([notice]);
       // Set the newly created data
-      setData({ ...tableData, data: [hydratedData[0], ...tableData.data] });
+      setData((t: any) => ({...t, data: [hydratedData[0], ...t.data]}));
     }
   }, [subLoading, noticeAdded]);
 
@@ -86,6 +88,7 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
         ({
           _id,
           description,
+          mimetype,
           createdAt,
           status,
           user: { firstName, lastName, email },
@@ -93,6 +96,7 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
           name: `${firstName} ${lastName}`,
           id: _id,
           email: email,
+          mimetype: mimetype,
           description: description,
           created: moment(createdAt).format('MMMM Do YYYY, h:mm:ss a'),
           status: status ? 'checkcircle' : 'info',

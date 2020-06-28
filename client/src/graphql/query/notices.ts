@@ -10,6 +10,7 @@ query {
     _id,
     description,
     createdAt,
+    mimetype,
     updatedAt,
     status,
     user {

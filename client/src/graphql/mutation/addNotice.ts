@@ -8,11 +8,7 @@ const ADD_NOTICE = gql`
 
 mutation addNotice($noticeInput: NoticeInput) {
     addNotice(noticeInput: $noticeInput) {
-      _id,
-      user {
-        _id,
-        firstName
-      }
+      _id
     }
   }
 `;

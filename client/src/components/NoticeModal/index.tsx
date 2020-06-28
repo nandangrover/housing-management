@@ -17,11 +17,11 @@ import {
   Container,
   Typography,
   makeStyles,
+  CircularProgress,
 } from '@material-ui/core';
 import { validateIfValue } from '../../utils/validation';
 import ADD_NOTICE from '../../graphql/mutation/addNotice';
 import { useMutation } from '@apollo/react-hooks';
-import { ExecutionResult } from 'react-apollo';
 import { UserContext } from '../../App';
 
 const styles: any = (theme: any) => ({
@@ -104,6 +104,8 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
 
   const [fileData, setFileData] = useState<any>(null);
 
+  const [noticeLoading, setLoading] = useState<any>(false);
+
   const [addNotice, { error: mutationError }] = useMutation(ADD_NOTICE);
 
   const handleClose = () => {
@@ -132,15 +134,23 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
   };
 
   const handleCapture = ({ target }: any) => {
-    const fileReader = new FileReader();
-    const name = target.files[0].name;
-
-    fileReader.readAsDataURL(target.files[0]);
-    fileReader.onload = (e: any) => {
-      // Set file name
-      setFileName(target.files[0].name);
-      setFileData({ [name]: e.target.result });
-    };
+    try {
+      const fileReader = new FileReader();
+      const name = target.files[0].name;
+  
+      fileReader.readAsDataURL(target.files[0]);
+      fileReader.onload = (e: any) => {
+        // Set file name
+        setFileName(target.files[0].name);
+        setFileData({ [name]: e.target.result });
+      };
+    } catch(e) {
+      reset();
+      handleClose();
+      toast.error('Something went wrong', {
+        autoClose: 6000,
+      })
+    }
   };
 
   const handleSubmit = async (event: any): Promise<void> => {
@@ -158,21 +168,31 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
         })
         return;
       }
-
-      const { data }: ExecutionResult = await addNotice({
+      setLoading(true);
+      await addNotice({
         variables: {
           noticeInput: { userId: user.userId, description, status, file: fileData[uploadedFileName], fileName: uploadedFileName, mimetype: uploadedFileName.split('.')[1] },
         },
       });
-
+      reset();
       handleClose();
     } catch (error) {
       console.log(error)
       toast.error(mutationError?.message ?? 'Unknown error', {
         autoClose: 6000,
       });
+      reset();
       handleClose();
     }
+  };
+
+  /**
+   * Reset state to defaults
+   */
+  const reset = (): void => {
+    setLoading(false);
+    setFileData(null);
+    setFileName(null);
   };
 
   return (
@@ -186,6 +206,7 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
         </DialogTitle>
         <DialogContent dividers>
           <Container component="main" maxWidth="xs">
+          {noticeLoading && <CircularProgress style={{margin: 'auto', display: 'block'}} color="secondary" />}
             <CssBaseline />
             <form className={classes.form} noValidate>
               <Grid container spacing={2}>

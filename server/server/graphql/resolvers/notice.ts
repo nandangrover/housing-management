@@ -60,7 +60,7 @@ const NoticeMutation = {
         description: noticeInput.description,
         status: noticeInput.status,
         file: data.Location,
-        mimetype: noticeInput.fileName
+        mimetype: noticeInput.fileName.split('.')[1]
       });
       const savedNotice = await newNotice.save();
 

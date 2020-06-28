@@ -12,12 +12,38 @@ const s3 = new AWS.S3({
  * @param fileContent
  */
 const uploadFile = async (fileName, fileContent): Promise<any> => {
+  const mimetype = fileName.split('.')[1];
+  let params: any = {};
+
   // Setting up S3 upload parameters
-  const params = {
-    Bucket: process.env.BUCKET_NAME,
-    Key: `assets/${fileName}`, // File name you want to save as in S3
-    Body: fileContent
-  };
+  if (mimetype === 'jpeg' || mimetype === 'png') {
+    const buf = Buffer.from(
+      fileContent.replace(/^data:image\/\w+;base64,/, ''),
+      'base64'
+    );
+
+    params = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: `assets/${fileName}`, // File name you want to save as in S3
+      Body: buf,
+      ContentEncoding: 'base64',
+      ContentType: 'image/jpeg'
+    };
+  } else if (mimetype === 'pdf') {
+    const buf = Buffer.from(
+      fileContent.replace(/^data:application\/\w+;base64,/, ''),
+      'base64'
+    );
+
+    params = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: `assets/${fileName}`, // File name you want to save as in S3
+      Body: buf,
+      ContentEncoding: 'base64',
+      ContentType: 'application/pdf',
+      ['Content-Disposition']: 'inline'
+    };
+  }
 
   // Uploading files to the bucket
 

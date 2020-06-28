@@ -14,7 +14,6 @@
     "dev": "yarn build && tsc --watch & nodemon dist/index.js",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pre-commit": "yarn tslint && yarn build",
     "tslint": "tslint --project tsconfig.json",
     "tslint:fix": "tslint --project tsconfig.json --fix",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
@@ -22,17 +21,13 @@
   "keywords": [],
   "author": "Nandan Grover",
   "license": "MIT",
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn pre-commit"
-    }
-  },
   "dependencies": {
     "apollo-server": "^2.9.6",
     "apollo-server-express": "^2.9.6",
     "aws-sdk": "^2.706.0",
     "bcrypt": "^5.0.0",
     "bluebird": "^3.5.5",
+    "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "graphql-voyager": "^1.0.0-rc.31",

@@ -13,12 +13,30 @@ const s3 = new aws_sdk_1.default.S3({
  * @param fileContent
  */
 const uploadFile = (fileName, fileContent) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+    const mimetype = fileName.split('.')[1];
+    let params = {};
     // Setting up S3 upload parameters
-    const params = {
-        Bucket: process.env.BUCKET_NAME,
-        Key: `assets/${fileName}`,
-        Body: fileContent
-    };
+    if (mimetype === 'jpeg' || mimetype === 'png') {
+        const buf = Buffer.from(fileContent.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+        params = {
+            Bucket: process.env.BUCKET_NAME,
+            Key: `assets/${fileName}`,
+            Body: buf,
+            ContentEncoding: 'base64',
+            ContentType: 'image/jpeg'
+        };
+    }
+    else if (mimetype === 'pdf') {
+        const buf = Buffer.from(fileContent.replace(/^data:application\/\w+;base64,/, ''), 'base64');
+        params = {
+            Bucket: process.env.BUCKET_NAME,
+            Key: `assets/${fileName}`,
+            Body: buf,
+            ContentEncoding: 'base64',
+            ContentType: 'application/pdf',
+            ['Content-Disposition']: 'inline'
+        };
+    }
     // Uploading files to the bucket
     return s3.upload(params).promise();
 });

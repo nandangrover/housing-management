@@ -5,6 +5,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
 const apollo_server_express_1 = require("apollo-server-express");
+const body_parser_1 = tslib_1.__importDefault(require("body-parser"));
 const cors_1 = tslib_1.__importDefault(require("cors"));
 const express_1 = tslib_1.__importDefault(require("express"));
 const middleware_1 = require("graphql-voyager/middleware");
@@ -21,6 +22,10 @@ class Express {
              * Creating an express application
              */
             this.express = express_1.default();
+            /**
+             * Ability to process huge files
+             */
+            this.express.use(body_parser_1.default.json({ limit: '50mb' }));
             /**
              * Middlerware for using CORS
              */
