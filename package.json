@@ -17,7 +17,7 @@
     "pre-commit": "yarn tslint && yarn build",
     "tslint": "tslint --project tsconfig.json",
     "tslint:fix": "tslint --project tsconfig.json --fix",
-    "heroku-postbuild": "YARN_PRODUCTION=false cd ./client yarn && yarn build"
+    "heroku-postbuild": "YARN_PRODUCTION=false cd ./client npm i && npm run build"
   },
   "keywords": [],
   "author": "Nandan Grover",
