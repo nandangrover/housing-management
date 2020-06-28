@@ -11,14 +11,12 @@ import {
   Button,
   CssBaseline,
   TextField,
-  Input,
   Grid,
   FormControlLabel,
   Container,
   Typography,
   makeStyles,
 } from '@material-ui/core';
-import classes from '*.module.css';
 
 const styles: any = (theme: any) => ({
   root: {
@@ -95,11 +93,6 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
   const [uploadedFileName, setFileName] = useState<any>(null);
 
   const [fileData, setFileData] = useState<any>(null);
-
-  // useEffect(() => {
-  //   const user = getUser();
-  //   if (user) props.history.replace('/home');
-  // });
 
   // const [createUser, { error: mutationError }] = useMutation(CREATE_USER);
   const handleClose = () => {
