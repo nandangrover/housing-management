@@ -66,7 +66,7 @@ const Notice: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
       <Container maxWidth="md">
         <div className="header-wrapper">
           <Typography
-            align="left"
+            align="center"
             variant="h4"
             color="textPrimary"
             style={{ margin: '20px 0px 8px' }}

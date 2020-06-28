@@ -2,5 +2,7 @@
  * Configuration
  */
 
-export const SERVER = 'http://localhost:4020/graphql';
-export const WEB_SOCKET_LINK = 'ws://localhost:4020/graphql';
+const isLocal = !!window.location.host.match(/localhost/g);
+
+export const SERVER = isLocal ? 'http://localhost:4020/graphql' : `${window.location.host}/graphql`;
+export const WEB_SOCKET_LINK = isLocal ? 'ws://localhost:4020/graphql' : `ws://${window.location.host}/graphql`;
