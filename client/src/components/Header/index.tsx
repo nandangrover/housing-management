@@ -11,6 +11,7 @@ import Menu from '@material-ui/core/Menu';
 import { UserContext } from '../../App';
 import Sidebar from '../Sidebar';
 import { RouteComponentProps } from 'react-router-dom';
+import './styles.scss';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -71,7 +72,7 @@ const Header: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
             Tesla Society
           </Typography>
           {user && (
-            <div>
+            <div className="account-holder">
               <IconButton
                 aria-label="account of current user"
                 aria-controls="menu-appbar"

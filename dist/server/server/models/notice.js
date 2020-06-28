@@ -25,6 +25,10 @@ const noticeSchema = new mongoose_1.default.Schema({
     file: {
         type: String,
         required: true
+    },
+    mimetype: {
+        type: String,
+        required: true
     }
 }, {
     timestamps: true

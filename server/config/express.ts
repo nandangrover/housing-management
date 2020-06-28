@@ -49,6 +49,11 @@ class Express {
     this.express.use(auth);
     this.server.applyMiddleware({ app: this.express });
     this.httpServer = http.createServer(this.express);
+
+    this.express.use(
+      '/voyager',
+      voyagerMiddleware({ endpointUrl: '/graphql' })
+    );
     /**
      * Installing subscription handlers
      */
@@ -62,11 +67,6 @@ class Express {
         res.sendFile(path.join(__dirname, '../../../', 'client', 'build', 'index.html'));
       });
     }
-
-    this.express.use(
-      '/voyager',
-      voyagerMiddleware({ endpointUrl: '/graphql' })
-    );
   }
 }
 

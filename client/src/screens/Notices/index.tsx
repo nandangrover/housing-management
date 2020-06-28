@@ -8,8 +8,9 @@ import Footer from '../../components/Footer';
 import { RouteComponentProps } from 'react-router-dom';
 import MaterialTable from 'material-table';
 import { Container, Typography, Button, Icon } from '@material-ui/core';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useSubscription } from '@apollo/react-hooks';
 import GET_NOTICES from '../../graphql/query/notices';
+import NOTICE_ADDED from '../../graphql/subscription/notice';
 import NoticeModal from '../../components/NoticeModal';
 import AddIcon from '@material-ui/icons/Add';
 import moment from 'moment';
@@ -17,6 +18,9 @@ import './styles.scss';
 
 const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   const { loading, data } = useQuery(GET_NOTICES);
+  const { data: noticeAdded, loading: subLoading }: any = useSubscription<any>(
+    NOTICE_ADDED
+  );
 
   const columns: any = [
     { title: 'Created By', field: 'name' },
@@ -26,7 +30,9 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
     {
       title: 'Resolved Status',
       field: 'status',
-      render: (rowData: any) => <Icon style={{ color: '#90caf9' }}>{rowData.status}</Icon> 
+      render: (rowData: any) => (
+        <Icon style={{ color: '#90caf9' }}>{rowData.status}</Icon>
+      ),
     },
   ];
 
@@ -36,10 +42,54 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   });
 
   const [modalState, setModalState] = useState<boolean>(false);
+
+  /**
+   * Check for query data change
+   */
   useEffect(() => {
     if (!loading) {
-      const mutatedData = data?.notices.map(
-        ({ _id, description, createdAt, status, user: { firstName, lastName, email} }: any) => ({
+      const mutatedData = hydrateNoticeData(data?.notices);
+
+      const actionData = [
+        {
+          icon: 'link',
+          tooltip: 'Link to notice',
+          onClick: (event: any, rowData: any) =>
+            props.history.push({
+              pathname: '/notice',
+              search: `?u=${rowData.id}`,
+              // state: { detail: response.data }
+            }),
+        },
+      ];
+      setData({ data: mutatedData, actions: actionData });
+    }
+  }, [loading, data]);
+
+  useEffect(() => {
+    if (!loading && noticeAdded) {
+      const { noticeAdded: notice } = noticeAdded;
+
+      const hydratedData = hydrateNoticeData([notice]);
+      // Set the newly created data
+      setData({ ...tableData, data: [hydratedData[0], ...tableData.data] });
+    }
+  }, [subLoading, noticeAdded]);
+
+  /**
+   * Hydrate data
+   * @param data
+   */
+  const hydrateNoticeData = (data: any) => {
+    return (
+      data?.map(
+        ({
+          _id,
+          description,
+          createdAt,
+          status,
+          user: { firstName, lastName, email },
+        }: any) => ({
           name: `${firstName} ${lastName}`,
           id: _id,
           email: email,
@@ -47,20 +97,9 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
           created: moment(createdAt).format('MMMM Do YYYY, h:mm:ss a'),
           status: status ? 'checkcircle' : 'info',
         })
-      ) ?? [];
-
-      const actionData = [{
-        icon: 'link',
-        tooltip: 'Link to notice',
-        onClick: (event: any, rowData: any) => props.history.push({
-          pathname: '/notice',
-          search: `?u=${rowData.id}`,
-          // state: { detail: response.data }
-        }),
-      }];
-      setData({ data: mutatedData, actions: actionData });
-    }
-  }, [loading, data]);
+      ) ?? []
+    );
+  };
 
   const showModal = () => {
     setModalState(true);
@@ -71,34 +110,34 @@ const Notices: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
       <Header {...props} />
       <Container maxWidth="md">
         <div className="header-wrapper">
-        <div className="sec-1">
-          <Typography
-            align="left"
-            variant="h4"
-            color="textPrimary"
-            style={{ margin: '20px 0px 8px' }}
-            className="title">
-            Notices
-          </Typography>
-          <Typography
-            align="left"
-            variant="body1"
-            color="textPrimary"
-            style={{ margin: '0px 0px 23px' }}
-            className="description">
-            Check for latest notice by fellow members!
-          </Typography>
+          <div className="sec-1">
+            <Typography
+              align="left"
+              variant="h4"
+              color="textPrimary"
+              style={{ margin: '20px 0px 8px' }}
+              className="title">
+              Notices
+            </Typography>
+            <Typography
+              align="left"
+              variant="body1"
+              color="textPrimary"
+              style={{ margin: '0px 0px 23px' }}
+              className="description">
+              Check for latest notice by fellow members!
+            </Typography>
           </div>
           <div className="sec-2">
-          <Button
-            variant="contained"
-            color="secondary"
-            className="add-notice"
-            onClick={showModal}
-            startIcon={<AddIcon />}>
-            Add Notice
-          </Button>
-          <NoticeModal state={modalState} setModalState={setModalState} />
+            <Button
+              variant="contained"
+              color="secondary"
+              className="add-notice"
+              onClick={showModal}
+              startIcon={<AddIcon />}>
+              Add Notice
+            </Button>
+            <NoticeModal state={modalState} setModalState={setModalState} />
           </div>
           <hr />
         </div>

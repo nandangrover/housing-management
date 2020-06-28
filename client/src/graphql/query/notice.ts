@@ -5,17 +5,18 @@
 import gql from 'graphql-tag';
 
 const GET_NOTICES = gql`
-query {
-  notices {
-    _id,
+query notice($noticeId: ID!) {
+  notice(noticeId: $noticeId) {
     description,
+    file,
+    mimetype,
     createdAt,
-    updatedAt,
     status,
     user {
       firstName,
       lastName,
-      email
+      email,
+      _id
     }
   }
 }

@@ -8,7 +8,7 @@ import './styles.scss';
 
 const Footer: React.FC = () => {
   return (
-    <Typography variant="body2" color="textSecondary" align="center">
+    <Typography style={{padding: '20px'}} variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <a target="_blank" color="inherit" href="https://www.nandangrover.com/">
         Nandan Grover

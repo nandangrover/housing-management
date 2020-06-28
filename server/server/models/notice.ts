@@ -25,6 +25,10 @@ const noticeSchema = new mongoose.Schema(
     file: {
       type: String,
       required: true
+    },
+    mimetype: {
+      type: String,
+      required: true
     }
   },
   {

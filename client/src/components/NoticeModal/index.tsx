@@ -1,5 +1,6 @@
-import React, { useState, FormEvent, ChangeEvent } from 'react';
+import React, { useState, useContext, ChangeEvent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
+import { toast } from 'react-toastify';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -17,6 +18,11 @@ import {
   Typography,
   makeStyles,
 } from '@material-ui/core';
+import { validateIfValue } from '../../utils/validation';
+import ADD_NOTICE from '../../graphql/mutation/addNotice';
+import { useMutation } from '@apollo/react-hooks';
+import { ExecutionResult } from 'react-apollo';
+import { UserContext } from '../../App';
 
 const styles: any = (theme: any) => ({
   root: {
@@ -82,19 +88,24 @@ const DialogActions = withStyles((theme: any) => ({
 }))(MuiDialogActions);
 
 const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
+  // Currently logged in user
+  const { user } = useContext(UserContext);
+  
   const [values, setValues] = useState<any>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    flat: '',
-    password: '',
+    description: '',
+    status: false,
+  });
+
+  const [validationError, setValidationError] = useState<any>({
+    description: false,
   });
 
   const [uploadedFileName, setFileName] = useState<any>(null);
 
   const [fileData, setFileData] = useState<any>(null);
 
-  // const [createUser, { error: mutationError }] = useMutation(CREATE_USER);
+  const [addNotice, { error: mutationError }] = useMutation(ADD_NOTICE);
+
   const handleClose = () => {
     setModalState(false);
   };
@@ -108,12 +119,21 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
   const handleChange = (name: string) => (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
+    setValidationError({ ...validationError, [name]: false });
     setValues({ ...values, [name]: event.currentTarget.value });
+  };
+
+  /**
+   * Handle Checkbox field change
+   * @param name
+   */
+  const handleCheckBoxChange = (name: string) => (event: any) => {
+    setValues({ ...values, [event.target.name]: event.target.checked });
   };
 
   const handleCapture = ({ target }: any) => {
     const fileReader = new FileReader();
-    const name = target.accept.includes('image') ? 'images' : 'videos';
+    const name = target.files[0].name;
 
     fileReader.readAsDataURL(target.files[0]);
     fileReader.onload = (e: any) => {
@@ -123,42 +143,36 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
     };
   };
 
-  const handleSubmit = async (
-    event: FormEvent<HTMLFormElement>
-  ): Promise<void> => {
-    event.preventDefault();
+  const handleSubmit = async (event: any): Promise<void> => {
+    try {
+      const { description, status } = values;
 
-    // try {
-    //   const { email, password, flat } = values;
+      if (!validateIfValue(description)) {
+        setValidationError({ ...validationError, description: true });
+        return;
+      }
 
-    //   if (!validatePassword(password)) {
-    //     toast.error('Invalid password', { autoClose: 6000 });
-    //     return;
-    //   }
+      if (!validateIfValue(uploadedFileName)) {
+        toast.error('Add a file to continue', {
+          autoClose: 6000,
+        })
+        return;
+      }
 
-    //   if (!validateEmail(email)) {
-    //     toast.error('Invalid Email', { autoClose: 6000 });
-    //     return;
-    //   }
+      const { data }: ExecutionResult = await addNotice({
+        variables: {
+          noticeInput: { userId: user.userId, description, status, file: fileData[uploadedFileName], fileName: uploadedFileName, mimetype: uploadedFileName.split('.')[1] },
+        },
+      });
 
-    //   if (!validateFlat(flat)) {
-    //     toast.error('Invalid Flat Number. Flat Number should be of type XX-NN', { autoClose: 6000 });
-    //     return;
-    //   }
-    //   const { data }: ExecutionResult = await createUser({
-    //     variables: {
-    //       userInput: { ...values },
-    //     },
-    //   });
-    //   const { token } = data?.createUser;
-    //   setToken(token);
-
-    //   setUser(getUser());
-    //   // Redirect to home
-    //   props.history.replace('/home');
-    // } catch (error) {
-    //   toast.error(mutationError?.message ?? 'Unknown error', { autoClose: 6000 });
-    // }
+      handleClose();
+    } catch (error) {
+      console.log(error)
+      toast.error(mutationError?.message ?? 'Unknown error', {
+        autoClose: 6000,
+      });
+      handleClose();
+    }
   };
 
   return (
@@ -173,10 +187,11 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
         <DialogContent dividers>
           <Container component="main" maxWidth="xs">
             <CssBaseline />
-            <form onSubmit={handleSubmit} className={classes.form} noValidate>
+            <form className={classes.form} noValidate>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
+                    error={validationError.description}
                     autoComplete="fname"
                     name="description"
                     variant="outlined"
@@ -185,6 +200,7 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
                     onChange={handleChange('description')}
                     id="description"
                     label="Notice Description"
+                    helperText="Description can't be empty"
                     autoFocus
                   />
                 </Grid>
@@ -192,8 +208,8 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={state.checkedA}
-                        onChange={handleChange('status')}
+                        checked={values.status}
+                        onChange={handleCheckBoxChange('status')}
                         name="status"
                       />
                     }
@@ -210,7 +226,9 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
                     multiple
                     type="file"
                   />{' '}
-                  <label style={{display:'flex'}} htmlFor="raised-button-file">
+                  <label
+                    style={{ display: 'flex' }}
+                    htmlFor="raised-button-file">
                     <Button
                       variant="contained"
                       component="span"
@@ -228,7 +246,7 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
           </Container>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleClose} color="primary">
+          <Button onClick={handleSubmit} autoFocus color="primary">
             Save changes
           </Button>
         </DialogActions>

@@ -19,6 +19,7 @@ const typeDefs = apollo_server_express_1.gql `
     updateUser(userId: ID!, updateUser: UpdateUser): User!
 
     addNotice(noticeInput: NoticeInput): Notice!
+    updateNotice(userId: ID!, noticeId: ID!, updateNotice: UpdateNotice): Notice!
   }
   type Subscription {
     userAdded: User
@@ -71,16 +72,10 @@ const typeDefs = apollo_server_express_1.gql `
     description: String!
     status: Boolean!
     file: String
+    mimetype: String!
     user: User!
     createdAt: String!
     updatedAt: String!
-  }
-
-  type File {
-    _id: ID!
-    filename: String!
-    mimetype: String!
-    encoding: String!
   }
 
   input NoticeInput {
@@ -88,6 +83,13 @@ const typeDefs = apollo_server_express_1.gql `
     description: String!
     status: Boolean!
     file: Upload!
+    fileName: String!
+    mimetype: String!
+  }
+
+  input UpdateNotice {
+    description: String
+    status: Boolean
   }
 `;
 const schema = {
@@ -95,10 +97,11 @@ const schema = {
     resolvers: index_1.default,
     introspection: true,
     context: ({ req, connection, payload }) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b;
         if (connection) {
-            return { isAuth: payload.authToken };
+            return { isAuth: payload.authToken, userId: (_a = req === null || req === void 0 ? void 0 : req.userId) !== null && _a !== void 0 ? _a : '' };
         }
-        return { isAuth: req.isAuth };
+        return { isAuth: req.isAuth, userId: (_b = req === null || req === void 0 ? void 0 : req.userId) !== null && _b !== void 0 ? _b : '' };
     }),
     playground: true
 };

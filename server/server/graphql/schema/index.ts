@@ -19,6 +19,7 @@ const typeDefs = gql`
     updateUser(userId: ID!, updateUser: UpdateUser): User!
 
     addNotice(noticeInput: NoticeInput): Notice!
+    updateNotice(userId: ID!, noticeId: ID!, updateNotice: UpdateNotice): Notice!
   }
   type Subscription {
     userAdded: User
@@ -71,16 +72,10 @@ const typeDefs = gql`
     description: String!
     status: Boolean!
     file: String
+    mimetype: String!
     user: User!
     createdAt: String!
     updatedAt: String!
-  }
-
-  type File {
-    _id: ID!
-    filename: String!
-    mimetype: String!
-    encoding: String!
   }
 
   input NoticeInput {
@@ -88,6 +83,13 @@ const typeDefs = gql`
     description: String!
     status: Boolean!
     file: Upload!
+    fileName: String!
+    mimetype: String!
+  }
+
+  input UpdateNotice {
+    description: String
+    status: Boolean
   }
 `;
 
@@ -97,9 +99,9 @@ const schema: ApolloServerExpressConfig = {
   introspection: true,
   context: async ({ req, connection, payload }: any) => {
     if (connection) {
-      return { isAuth: payload.authToken };
+      return { isAuth: payload.authToken, userId: req?.userId ?? '' };
     }
-    return { isAuth: req.isAuth };
+    return { isAuth: req.isAuth, userId: req?.userId ?? '' };
   },
   playground: true
 };

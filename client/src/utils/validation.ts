@@ -30,6 +30,16 @@ const validateFlat = (flat: string): boolean => {
   return false;
 };
 
+/**
+ * Value Validation
+ */
+const validateIfValue = (input: string): boolean => {
+  if (input) {
+    return true;
+  }
+  return false;
+};
 
 
-export { validateEmail, validatePassword, validateFlat };
+
+export { validateEmail, validatePassword, validateFlat, validateIfValue };

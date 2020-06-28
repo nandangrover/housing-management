@@ -9,11 +9,13 @@ import { RouteComponentProps } from 'react-router-dom';
 import MaterialTable from 'material-table';
 import { Container, Typography } from '@material-ui/core';
 import { useQuery } from '@apollo/react-hooks';
-import GET_USERS from '../../graphql/query/user';
+import GET_NOTICE from '../../graphql/query/notice';
 import './styles.scss';
 
 const Notice: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const { loading, data } = useQuery(GET_USERS);
+  const { loading, data } = useQuery(GET_NOTICE, {
+    variables: { noticeId: props.history.location.search.slice(3) },
+  });
 
   const columns: any = [
     { title: 'Name', field: 'name' },
@@ -36,18 +38,19 @@ const Notice: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
     data: [],
   });
   useEffect(() => {
-    if (!loading) {
-      const mutatedData = data?.users.map(
-        ({ email, firstName, flat, lastName, notices }: any) => ({
-          name: firstName,
-          email: email,
-          flat: flat,
-          surname: lastName,
-          noticeCount: notices.length,
-          unresolved: countUnresolved(notices),
-        })
-      ) ?? [];
-      setData({ data: mutatedData });
+    if (!loading && data) {
+      console.log(data)
+      // const mutatedData = data?.users.map(
+      //   ({ email, firstName, flat, lastName, notices }: any) => ({
+      //     name: firstName,
+      //     email: email,
+      //     flat: flat,
+      //     surname: lastName,
+      //     noticeCount: notices.length,
+      //     unresolved: countUnresolved(notices),
+      //   })
+      // ) ?? [];
+      // setData({ data: mutatedData });
     }
   }, [loading, data]);
 

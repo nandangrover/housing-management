@@ -10,6 +10,6 @@ exports.default = {
     db: process.env.DB,
     jwtSecret: process.env.JWT_SECRET,
     port: process.env.PORT,
-    allowedOrigins: ['http://localhost:3000', 'https://housingmanagement.herokuapp.com', 'housingmanagement.herokuapp.com ', 'http://localhost:4020']
+    allowedOrigins: ['http://localhost:3000', 'https://housingmanagement.herokuapp.com', 'http://housingmanagement.herokuapp.com', 'housingmanagement.herokuapp.com ', 'http://localhost:4020']
 };
 //# sourceMappingURL=index.js.map
