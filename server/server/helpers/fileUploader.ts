@@ -16,7 +16,7 @@ const uploadFile = async (fileName, fileContent): Promise<any> => {
   let params: any = {};
 
   // Setting up S3 upload parameters
-  if (mimetype === 'jpeg' || mimetype === 'png') {
+  if (mimetype === 'jpeg' || mimetype === 'png' || mimetype === 'jpg') {
     const buf = Buffer.from(
       fileContent.replace(/^data:image\/\w+;base64,/, ''),
       'base64'
@@ -27,7 +27,7 @@ const uploadFile = async (fileName, fileContent): Promise<any> => {
       Key: `assets/${fileName}`, // File name you want to save as in S3
       Body: buf,
       ContentEncoding: 'base64',
-      ContentType: 'image/jpeg'
+      ContentType: `image/${mimetype}`
     };
   } else if (mimetype === 'pdf') {
     const buf = Buffer.from(
@@ -43,6 +43,8 @@ const uploadFile = async (fileName, fileContent): Promise<any> => {
       ContentType: 'application/pdf',
       ['Content-Disposition']: 'inline'
     };
+  } else {
+    throw new Error('File type not supported');
   }
 
   // Uploading files to the bucket
