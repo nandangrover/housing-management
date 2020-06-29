@@ -106,7 +106,8 @@ const SignUp: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
       }
 
       if (!validateFlat(flat)) {
-        toast.error('Invalid Flat Number. Flat Number should be of type XX-NN', { autoClose: 6000 });
+        toast.error('Invalid Flat Number. Flat Number should be of type X*-N* (Example: Sapphire-456)'
+        , { autoClose: 6000 });
         return;
       }
       const { data }: ExecutionResult = await createUser({

@@ -24,7 +24,7 @@ const validatePassword = (password: string): boolean => {
  * Flat Number Validation
  */
 const validateFlat = (flat: string): boolean => {
-  if (/[A-Z]-[0-9{1-2}]/g.test(flat)) {
+  if (/[((A-Z{1,9})|(a-z{1,9})]-[0-9{1-9}]/g.test(flat)) {
     return true;
   }
   return false;
