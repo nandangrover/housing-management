@@ -16,14 +16,14 @@ const uploadFile = (fileName, fileContent) => tslib_1.__awaiter(void 0, void 0, 
     const mimetype = fileName.split('.')[1];
     let params = {};
     // Setting up S3 upload parameters
-    if (mimetype === 'jpeg' || mimetype === 'png') {
+    if (mimetype === 'jpeg' || mimetype === 'png' || mimetype === 'jpg') {
         const buf = Buffer.from(fileContent.replace(/^data:image\/\w+;base64,/, ''), 'base64');
         params = {
             Bucket: process.env.BUCKET_NAME,
             Key: `assets/${fileName}`,
             Body: buf,
             ContentEncoding: 'base64',
-            ContentType: 'image/jpeg'
+            ContentType: `image/${mimetype}`
         };
     }
     else if (mimetype === 'pdf') {
@@ -36,6 +36,9 @@ const uploadFile = (fileName, fileContent) => tslib_1.__awaiter(void 0, void 0, 
             ContentType: 'application/pdf',
             ['Content-Disposition']: 'inline'
         };
+    }
+    else {
+        throw new Error('File type not supported');
     }
     // Uploading files to the bucket
     return s3.upload(params).promise();
