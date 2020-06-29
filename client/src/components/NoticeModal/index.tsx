@@ -239,7 +239,7 @@ const NoticeModal: React.FC<any> = ({ state = false, setModalState }: any) => {
                 </Grid>
                 <Grid item xs={12}>
                   <input
-                    accept="image/jpeg,image/png,application/pdf"
+                    accept="image/jpeg,image/jpg,image/png,application/pdf"
                     className="input-file"
                     style={{ display: 'none' }}
                     onChange={handleCapture}
