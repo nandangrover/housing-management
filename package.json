@@ -22,7 +22,7 @@
   "author": "Nandan Grover",
   "license": "MIT",
   "dependencies": {
-    "apollo-server": "^2.9.6",
+    "apollo-server": "^2.25.3",
     "apollo-server-express": "^2.9.6",
     "aws-sdk": "^2.706.0",
     "bcrypt": "^5.0.0",
